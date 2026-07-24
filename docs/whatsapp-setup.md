@@ -1,16 +1,21 @@
 # WhatsApp Gateway einrichten
 
-## 1. Workflow importieren
+## 1. n8n-Variable anlegen
+
+In n8n die Projekt- oder Instanzeinstellungen öffnen und unter **Variables** anlegen:
+
+- Key: `META_VERIFY_TOKEN`
+- Value: ein selbst gewählter langer Zufallswert
+
+Der Workflow liest ihn über `$vars.META_VERIFY_TOKEN`. Diesen Wert später bei Meta exakt gleich als Verify Token eintragen.
+
+## 2. Workflow importieren
 
 In n8n **Workflows → Import from File** öffnen und `n8n/workflows/whatsapp-gateway.json` auswählen.
 
-## 2. Variable setzen
+## 3. Workflow veröffentlichen
 
-Auf der n8n-Instanz `META_VERIFY_TOKEN` setzen. Der Wert ist ein selbst gewählter, langer Zufallswert und muss später bei Meta exakt gleich eingetragen werden.
-
-## 3. Workflow aktivieren
-
-Den importierten Workflow speichern und aktivieren. Erst danach die Production-Webhook-URL verwenden.
+Den importierten Workflow speichern und über **Publish** aktivieren. Erst danach die Production-Webhook-URL verwenden.
 
 Der Pfad lautet:
 
@@ -23,7 +28,7 @@ Der Pfad lautet:
 In Meta unter **WhatsApp → Configuration → Webhook**:
 
 - Callback URL: Production-URL des n8n-Webhooks
-- Verify Token: derselbe Wert wie `META_VERIFY_TOKEN`
+- Verify Token: derselbe Wert wie die n8n-Variable `META_VERIFY_TOKEN`
 - Webhook-Feld abonnieren: `messages`
 
 ## 5. Test
