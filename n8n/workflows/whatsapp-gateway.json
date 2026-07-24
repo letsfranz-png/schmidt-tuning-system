@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const q = $json.query || {};\\nconst expected = $vars.META_VERIFY_TOKEN;\\nconst valid = q['hub.mode'] === 'subscribe' && q['hub.verify_token'] === expected;\\nreturn [{ json: { statusCode: valid ? 200 : 403, body: valid ? String(q['hub.challenge'] || '') : 'Forbidden' } }];"
+        "jsCode": "const q = $json.query || {};\nconst expected = $vars.META_VERIFY_TOKEN;\nconst valid = q['hub.mode'] === 'subscribe' && q['hub.verify_token'] === expected;\nreturn [{ json: { statusCode: valid ? 200 : 403, body: valid ? String(q['hub.challenge'] || '') : 'Forbidden' } }];"
       },
       "id": "verify-token",
       "name": "Verify Token prüfen",
@@ -67,7 +67,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const payload = $json.body || $json;\\nconst value = payload?.entry?.[0]?.changes?.[0]?.value || {};\\nconst message = value.messages?.[0] || null;\\nconst contact = value.contacts?.[0] || null;\\nreturn [{ json: { receivedAt: new Date().toISOString(), eventType: message ? 'message' : (value.statuses ? 'status' : 'unknown'), messageId: message?.id || null, from: message?.from || null, customerName: contact?.profile?.name || null, messageType: message?.type || null, text: message?.text?.body || null, timestamp: message?.timestamp || null, raw: payload } }];"
+        "jsCode": "const payload = $json.body || $json;\nconst value = payload?.entry?.[0]?.changes?.[0]?.value || {};\nconst message = value.messages?.[0] || null;\nconst contact = value.contacts?.[0] || null;\nreturn [{ json: { receivedAt: new Date().toISOString(), eventType: message ? 'message' : (value.statuses ? 'status' : 'unknown'), messageId: message?.id || null, from: message?.from || null, customerName: contact?.profile?.name || null, messageType: message?.type || null, text: message?.text?.body || null, timestamp: message?.timestamp || null, raw: payload } }];"
       },
       "id": "normalize-event",
       "name": "Ereignis normalisieren",
