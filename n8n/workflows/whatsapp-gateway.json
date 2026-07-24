@@ -1,0 +1,155 @@
+{
+  "name": "Schmidt Tuning – WhatsApp Gateway",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "schmidt-tuning/whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-verify",
+      "name": "Meta Webhook Verifizierung",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        -160
+      ],
+      "webhookId": "schmidt-tuning-whatsapp-verify"
+    },
+    {
+      "parameters": {
+        "jsCode": "const q = $json.query || {};\\nconst expected = $env.META_VERIFY_TOKEN;\\nconst valid = q['hub.mode'] === 'subscribe' && q['hub.verify_token'] === expected;\\nreturn [{ json: { statusCode: valid ? 200 : 403, body: valid ? String(q['hub.challenge'] || '') : 'Forbidden' } }];"
+      },
+      "id": "verify-token",
+      "name": "Verify Token prüfen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.body }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode }}"
+        }
+      },
+      "id": "respond-verify",
+      "name": "Verifizierung beantworten",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "schmidt-tuning/whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-inbound",
+      "name": "WhatsApp Ereignis empfangen",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        160
+      ],
+      "webhookId": "schmidt-tuning-whatsapp-inbound"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $json.body || $json;\\nconst value = payload?.entry?.[0]?.changes?.[0]?.value || {};\\nconst message = value.messages?.[0] || null;\\nconst contact = value.contacts?.[0] || null;\\nreturn [{ json: { receivedAt: new Date().toISOString(), eventType: message ? 'message' : (value.statuses ? 'status' : 'unknown'), messageId: message?.id || null, from: message?.from || null, customerName: contact?.profile?.name || null, messageType: message?.type || null, text: message?.text?.body || null, timestamp: message?.timestamp || null, raw: payload } }];"
+      },
+      "id": "normalize-event",
+      "name": "Ereignis normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { received: true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-inbound",
+      "name": "Empfang bestätigen",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Meta Webhook Verifizierung": {
+      "main": [
+        [
+          {
+            "node": "Verify Token prüfen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Token prüfen": {
+      "main": [
+        [
+          {
+            "node": "Verifizierung beantworten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Ereignis empfangen": {
+      "main": [
+        [
+          {
+            "node": "Ereignis normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ereignis normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Empfang bestätigen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "c241ef3c-1af3-4d67-8e95-36e5b87c3c1f",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
