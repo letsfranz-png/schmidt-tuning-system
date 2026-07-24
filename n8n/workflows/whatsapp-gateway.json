@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const q = $json.query || {};\\nconst expected = $env.META_VERIFY_TOKEN;\\nconst valid = q['hub.mode'] === 'subscribe' && q['hub.verify_token'] === expected;\\nreturn [{ json: { statusCode: valid ? 200 : 403, body: valid ? String(q['hub.challenge'] || '') : 'Forbidden' } }];"
+        "jsCode": "const q = $json.query || {};\\nconst expected = $vars.META_VERIFY_TOKEN;\\nconst valid = q['hub.mode'] === 'subscribe' && q['hub.verify_token'] === expected;\\nreturn [{ json: { statusCode: valid ? 200 : 403, body: valid ? String(q['hub.challenge'] || '') : 'Forbidden' } }];"
       },
       "id": "verify-token",
       "name": "Verify Token prüfen",
